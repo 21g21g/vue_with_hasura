@@ -56,7 +56,7 @@ const {mutate:addTodo}=useMutation(gql`
                   <option value="confirmed">confirmed</option>
              </select>
              <h1 v-if="status">{{status}}</h1>
-             <button type="submit">Submit</button>
+             <button class="text-green-500" type="submit">Submit</button>
         </div>
 
         </form>

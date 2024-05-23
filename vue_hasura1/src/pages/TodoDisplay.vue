@@ -1,7 +1,7 @@
 <script setup>
 import { gql } from 'graphql-tag'
 import {useMutation, useQuery} from "@vue/apollo-composable"
-import { watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 
 const {result,loading,error}=useQuery(gql`
 query{
@@ -14,9 +14,37 @@ query{
 }
 
 `)
-watch(result,()=>{
-    console.log(result.value)
-})
+const search=ref("")
+const filteredTodo=ref(result?result.todo:[])
+// watch(result,()=>{
+
+// onMounted(()=>{
+//   if(result?.value){
+//     filteredFunction()
+//   }
+  
+
+// })
+const filteredFunction=()=>{
+   if (!result?.todo) {
+    return; 
+  }
+  console.log(search.value)
+  console.log("filtering")
+  const searchTerm=search.value.toLowerCase().trim()
+  console.log(searchTerm)
+  if(!searchTerm){
+    filteredTodo.value=result?.todo||[]
+  }
+  else{
+    filteredTodo.value=result?.todo.filter((todo)=>todo.title.toLowerCase().includes(searchTerm))||[]
+  }
+  console.log(filteredTodo.value)
+  console.log(result.value)
+
+}
+watch(search,filteredFunction)
+
 const handleButton=(id)=>{
   console.log(id)
   deleteTodo({id})
@@ -35,8 +63,13 @@ const {mutate:deleteTodo}=useMutation(gql`
 )
 </script>
 <template>
-  <div class="mt-2">
-    <table class="w-full border-collapse border">
+  <div class="mt-2 flex flex-col w-full">
+    <div class="flex self-end p-3">
+        <input class="px-4 py-2 border " type="text" placeholder="search by name" v-model="search">
+        <!-- <button @click="filteredFunction">search</button> -->
+
+    </div>
+     <table class="w-full border-collapse border mt-2">
       <thead>
         <tr class="bg-gray-200">
           <th class="px-4 py-2">Title</th>
@@ -62,5 +95,6 @@ const {mutate:deleteTodo}=useMutation(gql`
         </tr>
       </tbody>
     </table>
+   
   </div>
 </template>
